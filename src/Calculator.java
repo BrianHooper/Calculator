@@ -2,11 +2,11 @@ public class Calculator {
 
     public void run() {
         Equation eq = new Equation();
-        eq.addOperand("(1+2)*(3+4)/(12-5)");
-        eq.backspace();
-        eq.backspace();
-        eq.calculate();
-        System.out.println(eq.getResult());
+        eq.addOperand("((12+16)*((3156+(2+87))^(163+0)))");
+        if(!eq.calculate()) {
+            System.out.println(eq.getErrorMsg());
+        }
+
     }
 
     public static void main(String[] args) {
