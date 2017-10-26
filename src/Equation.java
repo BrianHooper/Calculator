@@ -8,7 +8,7 @@ public class Equation {
     private String errorMsg;
     private double result;
     private int size;
-    private final int maxLength = 45;
+    private final int maxLength = 20;
 
     public Equation() {
         clear();
@@ -56,6 +56,10 @@ public class Equation {
         }
     }
 
+    public String getExpression() {
+        return expression.toString();
+    }
+
     /**
      * Calculates the expression. Sets error message
      * if the calculation failed.
@@ -72,8 +76,7 @@ public class Equation {
         try {
             exprList = toLinkedList(expression.toString());
             exprList = toPostFix(exprList);
-            evaluate(exprList);
-            return true;
+            return evaluate(exprList);
         } catch(NumberFormatException|InvalidExpressionException e) {
             errorMsg = "Invalid expression";
             return false;
@@ -305,8 +308,14 @@ public class Equation {
                     a = stack.pop();
                     current = performCalculation(a, b, current);
                     stack.push(current);
-                } catch(NumberFormatException|InvalidExpressionException e) {
+                } catch(NumberFormatException|EmptyStackException e) {
                     errorMsg = "Evaluation error";
+                    return false;
+                } catch(InvalidExpressionException e) {
+                    errorMsg = e.getMessage();
+                    return false;
+                } catch(ArithmeticException e) {
+                    errorMsg = "Arithmetic overflow error";
                     return false;
                 }
             }
@@ -322,7 +331,7 @@ public class Equation {
     }
 
     private String performCalculation(String a, String b, String operator)
-            throws InvalidExpressionException, NumberFormatException {
+            throws InvalidExpressionException, NumberFormatException, ArithmeticException {
 
         double num1 = Double.parseDouble(a);
         double num2 = Double.parseDouble(b);
@@ -331,11 +340,17 @@ public class Equation {
         switch(operator) {
             case "^":
                 result = Math.pow(num1, num2);
+                if(Double.isInfinite(result)) {
+                    throw new InvalidExpressionException("Arithmetic overflow error.");
+                }
                 break;
             case "*":
                 result = num1 * num2;
                 break;
             case "/":
+                if(num2 == 0.0) {
+                    throw new InvalidExpressionException("Cannot divide by zero");
+                }
                 result = num1 / num2;
                 break;
             case "+":
