@@ -1,5 +1,4 @@
 import java.util.EmptyStackException;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Stack;
 
@@ -115,7 +114,8 @@ public class Equation {
      * @return LinkedList of Strings
      * @throws NumberFormatException throws exception if a number is invalid
      */
-    private LinkedList<String> toLinkedList(String infix) throws NumberFormatException{
+    private LinkedList<String> toLinkedList(String infix) throws
+            NumberFormatException{
         StringBuilder numberBuilder = new StringBuilder();
         LinkedList<String> ifList = new LinkedList<>();
 
@@ -125,7 +125,7 @@ public class Equation {
             char curChar = infix.charAt(i);
 
             // If the character is an operator, add it to the pfList
-            if(isOperator(curChar)) {
+            if(!isNumber(curChar)) {
 
                 // If there is a number currently being built
                 // Add it to the pfList and clear the builder
@@ -161,10 +161,12 @@ public class Equation {
      * @param infix LinkedList of Strings representing the infix expression
      * @return LinkedList of Strings as a postfix expression
      */
-    private LinkedList<String> toPostFix(LinkedList<String> infix) throws InvalidExpressionException{
+    private LinkedList<String> toPostFix(LinkedList<String> infix) throws
+            InvalidExpressionException{
         LinkedList<String> postfix = new LinkedList<>();
         Stack<String> stack = new Stack<>();
         String currentElement;
+        String lastElement = null;
 
         // Iterate over each element in the infix list
         while(infix.size() > 0) {
@@ -183,20 +185,25 @@ public class Equation {
             } else if(isNumber(currentElement)) {
                 // Append the number to the postfix list
                 postfix.add(currentElement);
+                if(!stack.isEmpty() && stack.peek().equals("_")){
+                    postfix.add(stack.pop());
+                }
             } else {
-                if(stack.isEmpty()) {
-                    // Push the operator to the stack
+                if(currentElement.equals("-") && lastElement == null || (!lastElement.equals(")") && !isNumber(lastElement))) {
+                    stack.push("_");
+                } else if(stack.isEmpty()) {
                     stack.push(currentElement);
                 } else {
                     // Append the operators on the stack to the postfix list
                     // Until a lower precedence operator is encountered
-                    while(!stack.isEmpty() && !isParenthesis(stack.peek())
-                            && precedence(currentElement, stack.peek())) {
+                    while(!stack.isEmpty() && precedence(currentElement,
+                            stack.peek())) {
                         postfix.add(stack.pop());
                     }
                     stack.push(currentElement);
                 }
             }
+            lastElement = currentElement;
         }
 
         // Add any remaining operators in the stack to the postfix list
@@ -208,41 +215,6 @@ public class Equation {
         }
 
         return postfix;
-    }
-
-    /**
-     * Checks if the input is a parenthesis
-     * @param s String input
-     * @return true if input was a single parenthesis
-     */
-    private boolean isParenthesis(String s) {
-        return s.equals("(") || s.equals(")");
-    }
-
-    /**
-     * Checks if a character is an operator
-     * @param c The character to check
-     * @return true if the character is an operator
-     */
-    private boolean isOperator(char c) {
-        switch(c) {
-            case '(':
-                return true;
-            case ')':
-                return true;
-            case '+':
-                return true;
-            case '-':
-                return true;
-            case '*':
-                return true;
-            case '/':
-                return true;
-            case '^':
-                return true;
-            default:
-                return false;
-        }
     }
 
     /**
@@ -280,7 +252,7 @@ public class Equation {
 
     /**
      * Checks that the input can be expressed as a valid
-     * doubleing-point number
+     * floating-point number
      * @param s String input
      * @return true if the input is a number
      */
@@ -293,9 +265,29 @@ public class Equation {
         }
     }
 
+    /**
+     * Checks that the input can be expressed as a valid
+     * floating-point number
+     * @param c Character input
+     * @return true if the input is a number
+     */
+    private boolean isNumber(char c) {
+        return isNumber(String.valueOf(c));
+    }
+
+    /**
+     * Attempts to evaluate a postfix expression
+     * @param postfix LinkedList of Strings representing an expression in
+     *                postfix form
+     * @return true if the expression was successfully evaluated
+     */
     private boolean evaluate(LinkedList<String> postfix) {
-        Stack<String> stack = new Stack<>();
+        LinkedList<String> stack = new LinkedList<>();
         String current, calcResult, a, b;
+
+        for(int i = 0; i < postfix.size(); i++) {
+            System.out.print(postfix.get(i) + " ");
+        }
 
         while(!postfix.isEmpty()) {
             current = postfix.removeFirst();
@@ -305,9 +297,13 @@ public class Equation {
             } else {
                 try {
                     b = stack.pop();
-                    a = stack.pop();
-                    current = performCalculation(a, b, current);
-                    stack.push(current);
+                    if(current.equals("_")) {
+                        stack.push(negate(b));
+                    } else {
+                        a = stack.pop();
+                        current = performCalculation(a, b, current);
+                        stack.push(current);
+                    }
                 } catch(NumberFormatException|EmptyStackException e) {
                     errorMsg = "Evaluation error";
                     return false;
@@ -330,37 +326,54 @@ public class Equation {
         }
     }
 
+    /**
+     * Attempts to perform a calculation between two numbers
+     * @param a String representation of the first number
+     * @param b String representation of the second number
+     * @param operator String representing the mathematical operator
+     * @return String containing the result of the expression
+     * @throws InvalidExpressionException Thrown when the expression is invalid,
+     *      such as division by zero or an unknown operator
+     * @throws NumberFormatException thrown when either a or b cannot be
+     *      converted to a floating-point number
+     */
     private String performCalculation(String a, String b, String operator)
-            throws InvalidExpressionException, NumberFormatException, ArithmeticException {
-
+            throws InvalidExpressionException, NumberFormatException {
+        double operationResult;
         double num1 = Double.parseDouble(a);
         double num2 = Double.parseDouble(b);
-        double result = 0.0;
 
         switch(operator) {
             case "^":
-                result = Math.pow(num1, num2);
-                if(Double.isInfinite(result)) {
-                    throw new InvalidExpressionException("Arithmetic overflow error.");
+                operationResult = Math.pow(num1, num2);
+                if(Double.isInfinite(operationResult)) {
+                    throw new InvalidExpressionException(
+                            "Arithmetic overflow error.");
                 }
                 break;
             case "*":
-                result = num1 * num2;
+                operationResult = num1 * num2;
                 break;
             case "/":
                 if(num2 == 0.0) {
-                    throw new InvalidExpressionException("Cannot divide by zero");
+                    throw new InvalidExpressionException(
+                            "Cannot divide by zero");
                 }
-                result = num1 / num2;
+                operationResult = num1 / num2;
                 break;
             case "+":
-                result = num1 + num2;
+                operationResult = num1 + num2;
                 break;
             case "-":
-                result = num1 - num2;
+                operationResult = num1 - num2;
                 break;
+            default:
+                throw new InvalidExpressionException("Error: unknown operator");
         }
 
-        return String.valueOf(result);
+        return String.valueOf(operationResult);
+    }
+    private String negate(String operand) throws NumberFormatException{
+        return String.valueOf(Double.parseDouble(operand) * -1);
     }
 }

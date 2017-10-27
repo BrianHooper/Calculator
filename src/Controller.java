@@ -4,10 +4,12 @@ import java.awt.event.ActionListener;
 public class Controller implements ActionListener {
     private Equation equationModel;
     private View view;
+    private String inputs;
 
-    public Controller(Equation eq, View v) {
+    public Controller(Equation eq, View v, String validInputs) {
         this.equationModel = eq;
         this.view = v;
+        this.inputs = validInputs;
     }
 
     @Override
