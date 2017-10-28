@@ -1,5 +1,6 @@
 import java.util.EmptyStackException;
 import java.util.LinkedList;
+import java.util.NoSuchElementException;
 import java.util.Stack;
 
 public class Equation {
@@ -7,7 +8,7 @@ public class Equation {
     private String errorMsg;
     private double result;
     private int size;
-    private final int maxLength = 20;
+    private final int maxLength = 25;
 
     public Equation() {
         clear();
@@ -165,7 +166,7 @@ public class Equation {
             InvalidExpressionException{
         LinkedList<String> postfix = new LinkedList<>();
         Stack<String> stack = new Stack<>();
-        String currentElement;
+        String currentElement = null;
         String lastElement = null;
 
         // Iterate over each element in the infix list
@@ -189,8 +190,13 @@ public class Equation {
                     postfix.add(stack.pop());
                 }
             } else {
-                if(currentElement.equals("-") && lastElement == null || (!lastElement.equals(")") && !isNumber(lastElement))) {
-                    stack.push("_");
+                if(currentElement.equals("-")) {
+                    if(lastElement == null) {
+                        stack.push("_");
+                    } else if(!lastElement.equals(")") && !isNumber(lastElement)) {
+                        stack.push("_");
+                }
+
                 } else if(stack.isEmpty()) {
                     stack.push(currentElement);
                 } else {
@@ -285,10 +291,6 @@ public class Equation {
         LinkedList<String> stack = new LinkedList<>();
         String current, calcResult, a, b;
 
-        for(int i = 0; i < postfix.size(); i++) {
-            System.out.print(postfix.get(i) + " ");
-        }
-
         while(!postfix.isEmpty()) {
             current = postfix.removeFirst();
 
@@ -304,7 +306,8 @@ public class Equation {
                         current = performCalculation(a, b, current);
                         stack.push(current);
                     }
-                } catch(NumberFormatException|EmptyStackException e) {
+                } catch(NumberFormatException|EmptyStackException|
+                        NoSuchElementException e) {
                     errorMsg = "Evaluation error";
                     return false;
                 } catch(InvalidExpressionException e) {

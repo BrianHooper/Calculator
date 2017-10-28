@@ -6,10 +6,9 @@ public class Controller implements ActionListener {
     private View view;
     private String inputs;
 
-    public Controller(Equation eq, View v, String validInputs) {
+    public Controller(Equation eq, View v) {
         this.equationModel = eq;
         this.view = v;
-        this.inputs = validInputs;
     }
 
     @Override
@@ -17,6 +16,7 @@ public class Controller implements ActionListener {
         String action = actionEvent.getActionCommand();
         switch(action) {
             case "=": {
+                view.updateHistory();
                 if(equationModel.calculate()) {
                     view.update(equationModel.getResult());
 
@@ -26,11 +26,12 @@ public class Controller implements ActionListener {
                 equationModel.clear();
                 break;
             }
-            case "c":
+            case "C":
                 equationModel.clear();
                 view.update("");
+                view.updateHistory();
                 break;
-            case "←":
+            case "b":
                 if(equationModel.backspace()) {
                     view.update(equationModel.getExpression());
                 }
