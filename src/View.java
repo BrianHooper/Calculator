@@ -1,14 +1,17 @@
 import javax.swing.*;
 import java.awt.event.ActionListener;
 
-public class View {
-    private Equation eq;
+class View {
+    public static final int MAX_SIZE = 25;
     private CalcLayout layout;
 
+    /**
+     * Creates a GUI
+     * @param equationModel Model field for calculating expressions
+     */
     public View(Equation equationModel) {
-        eq = equationModel;
         // Initialize the model
-        ActionListener controller = new Controller(eq, this);
+        ActionListener controller = new Controller(equationModel, this);
         layout = new CalcLayout(controller);
 
         JFrame frame = new JFrame("Calculator");
@@ -28,6 +31,11 @@ public class View {
         layout.update(message);
     }
 
+    /**
+     * Sets the history field to the value of the equation field,
+     * so that when an expression is calculated, both the result
+     * and the expression are shown
+     */
     public void updateHistory() {
         layout.updateHistory();
     }

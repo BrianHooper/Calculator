@@ -1,8 +1,7 @@
 import javax.swing.*;
 import java.awt.event.ActionListener;
 
-public class CalcLayout {
-    private ActionListener controller;
+class CalcLayout {
 
     private JLabel equationField;
     private JPanel mainPanel;
@@ -30,8 +29,12 @@ public class CalcLayout {
     private JButton rightParen;
     private JLabel lastEquation;
 
-    public CalcLayout(ActionListener c) {
-        this.controller = c;
+    /**
+     * Creates a new CalcLayout and assigns
+     * ActionListeners to each child component
+     * @param controller ActionListener for sending button input to the model
+     */
+    public CalcLayout(ActionListener controller) {
 
         one.addActionListener(controller);
         two.addActionListener(controller);
@@ -56,15 +59,27 @@ public class CalcLayout {
         rightParen.addActionListener(controller);
     }
 
+    /**
+     * Allows the main JPanel to be added to a frame
+     * @return JPanel object with child components
+     */
     public  JPanel getPanel() {
         return mainPanel;
     }
 
+    /**
+     * Sets the equation field
+     * @param message String that the field will display
+     */
     public void update(String message) {
 
         equationField.setText("  " + message);
     }
 
+    /**
+     * Sets the history field to the current value
+     * of the equation field
+     */
     public void updateHistory() {
         lastEquation.setText(equationField.getText());
     }

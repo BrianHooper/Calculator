@@ -30,7 +30,7 @@
           </grid>
         </constraints>
         <properties>
-          <text value="C"/>
+          <text value="&amp;C"/>
         </properties>
       </component>
       <component id="8dc29" class="javax.swing.JButton" binding="backspace">
@@ -226,30 +226,42 @@
           <text value="2"/>
         </properties>
       </component>
-      <component id="a8b44" class="javax.swing.JLabel" binding="equationField">
+      <grid id="a40cd" layout-manager="GridLayoutManager" row-count="2" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+        <margin top="0" left="0" bottom="0" right="0"/>
         <constraints>
-          <grid row="1" column="0" row-span="2" col-span="3" vsize-policy="0" hsize-policy="0" anchor="10" fill="0" indent="0" use-parent-layout="false">
-            <minimum-size width="300" height="50"/>
-            <preferred-size width="300" height="50"/>
-          </grid>
+          <grid row="1" column="0" row-span="2" col-span="3" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
         </constraints>
-        <properties>
-          <alignmentX value="0.0"/>
-          <alignmentY value="0.0"/>
-          <font size="16"/>
-          <text value=""/>
-        </properties>
-      </component>
-      <component id="ecb64" class="javax.swing.JLabel" binding="lastEquation">
-        <constraints>
-          <grid row="0" column="0" row-span="1" col-span="3" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false">
-            <minimum-size width="300" height="25"/>
-          </grid>
-        </constraints>
-        <properties>
-          <text value=""/>
-        </properties>
-      </component>
+        <properties/>
+        <border type="line">
+          <color color="-16777216"/>
+        </border>
+        <children>
+          <component id="a8b44" class="javax.swing.JLabel" binding="equationField">
+            <constraints>
+              <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="10" fill="0" indent="0" use-parent-layout="false">
+                <minimum-size width="300" height="50"/>
+                <preferred-size width="300" height="50"/>
+              </grid>
+            </constraints>
+            <properties>
+              <alignmentX value="0.0"/>
+              <alignmentY value="0.0"/>
+              <font size="16"/>
+              <text value=""/>
+            </properties>
+          </component>
+          <component id="ecb64" class="javax.swing.JLabel" binding="lastEquation">
+            <constraints>
+              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false">
+                <minimum-size width="300" height="25"/>
+              </grid>
+            </constraints>
+            <properties>
+              <text value=""/>
+            </properties>
+          </component>
+        </children>
+      </grid>
     </children>
   </grid>
 </form>

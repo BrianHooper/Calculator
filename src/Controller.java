@@ -1,16 +1,25 @@
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class Controller implements ActionListener {
+class Controller implements ActionListener {
     private Equation equationModel;
     private View view;
-    private String inputs;
 
+    /**
+     * Creates a new ActionListener object for
+     * sending button input to the model
+     * @param eq The Equation object that the input is sent to
+     * @param v The view that this ActionListener is receiving events from
+     */
     public Controller(Equation eq, View v) {
         this.equationModel = eq;
         this.view = v;
     }
 
+    /**
+     * Sends action events to the model
+     * @param actionEvent actionEvent object representing a button press
+     */
     @Override
     public void actionPerformed(ActionEvent actionEvent) {
         String action = actionEvent.getActionCommand();
@@ -23,6 +32,7 @@ public class Controller implements ActionListener {
                 } else {
                     view.update(equationModel.getErrorMsg());
                 }
+                System.out.println(equationModel.getErrorLog());
                 equationModel.clear();
                 break;
             }
