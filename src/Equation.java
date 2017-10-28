@@ -26,7 +26,7 @@ class Equation {
         postfixExpression = new StringBuilder();
         errorListing = new StringBuilder();
         result = 0.0;
-        errorMsg = "None";
+        errorMsg = "";
         size = 0;
     }
 
@@ -99,6 +99,7 @@ class Equation {
      * @return true if the expression calculated successfully.
      */
     public boolean calculate() {
+        System.out.println(expression.length());
         if (expression.length() == 0) {
             return false;
         }
@@ -159,28 +160,30 @@ class Equation {
 
             // If the character is an operator, add it to the pfList
             if (!isNumber(curChar)) {
-
-                // If there is a number currently being built
-                // Add it to the pfList and clear the builder
-                if (numberBuilder.length() > 0) {
-                    // Check that the number in the builder is valid
-                    isNumber(numberBuilder.toString());
-                    ifList.add(numberBuilder.toString());
-                    numberBuilder = new StringBuilder();
-                }
-
-                // Automatically add implied multiplication operator
-                // When parenthesis are used
-                if (curChar == '(' && !ifList.isEmpty() && isNumber(ifList.getLast())) {
-                    ifList.add("*");
-                    ifList.add(String.valueOf(curChar));
-                } else if (curChar == ')' && i < infix.length() - 1 && (isNumber(String.valueOf(infix.charAt(i + 1))) || infix.charAt(i + 1) == '(')) {
-                    ifList.add(String.valueOf(curChar));
-                    ifList.add("*");
+                if(curChar == '.') {
+                    numberBuilder.append(curChar);
                 } else {
-                    ifList.add(String.valueOf(curChar));
+                    // If there is a number currently being built
+                    // Add it to the pfList and clear the builder
+                    if (numberBuilder.length() > 0) {
+                        // Check that the number in the builder is valid
+                        isNumber(numberBuilder.toString());
+                        ifList.add(numberBuilder.toString());
+                        numberBuilder = new StringBuilder();
+                    }
+
+                    // Automatically add implied multiplication operator
+                    // When parenthesis are used
+                    if (curChar == '(' && !ifList.isEmpty() && isNumber(ifList.getLast())) {
+                        ifList.add("*");
+                        ifList.add(String.valueOf(curChar));
+                    } else if (curChar == ')' && i < infix.length() - 1 && (isNumber(String.valueOf(infix.charAt(i + 1))) || infix.charAt(i + 1) == '(')) {
+                        ifList.add(String.valueOf(curChar));
+                        ifList.add("*");
+                    } else {
+                        ifList.add(String.valueOf(curChar));
+                    }
                 }
-                // Add the operator to the pfList
 
             } else {
                 // Append the current character to the numberBuilder
@@ -242,10 +245,9 @@ class Equation {
                         stack.push("_");
                     } else if (!lastElement.equals(")") && !isNumber(lastElement)) {
                         stack.push("_");
+                    } else if (stack.isEmpty()) {
+                        stack.push(currentElement);
                     }
-
-                } else if (stack.isEmpty()) {
-                    stack.push(currentElement);
                 } else {
                     // Append the operators on the stack to the postfix list
                     // Until a lower precedence operator is encountered

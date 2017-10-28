@@ -1,7 +1,8 @@
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-class Controller implements ActionListener {
+class Controller extends AbstractAction {
     private Equation equationModel;
     private View view;
 
@@ -23,6 +24,10 @@ class Controller implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent actionEvent) {
         String action = actionEvent.getActionCommand();
+        performAction(action);
+    }
+
+    public void performAction(String action) {
         switch(action) {
             case "=": {
                 view.updateHistory();

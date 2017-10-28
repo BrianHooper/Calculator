@@ -1,10 +1,15 @@
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+import java.security.Key;
 
 class CalcLayout {
 
     private JLabel equationField;
     private JPanel mainPanel;
+    private JLabel lastEquation;
 
     private JButton one;
     private JButton two;
@@ -27,36 +32,35 @@ class CalcLayout {
     private JButton divide;
     private JButton leftParen;
     private JButton rightParen;
-    private JLabel lastEquation;
+
 
     /**
      * Creates a new CalcLayout and assigns
      * ActionListeners to each child component
-     * @param controller ActionListener for sending button input to the model
+     * @param controller Controller for sending button input to the model
      */
-    public CalcLayout(ActionListener controller) {
+    public CalcLayout(Controller controller) {
+        String actionCommand;
+        KeyStroke keystroke;
 
-        one.addActionListener(controller);
-        two.addActionListener(controller);
-        three.addActionListener(controller);
-        equals.addActionListener(controller);
-        clear.addActionListener(controller);
-        backspace.addActionListener(controller);
-        exponent.addActionListener(controller);
-        six.addActionListener(controller);
-        five.addActionListener(controller);
-        four.addActionListener(controller);
-        seven.addActionListener(controller);
-        eight.addActionListener(controller);
-        nine.addActionListener(controller);
-        plus.addActionListener(controller);
-        minus.addActionListener(controller);
-        zero.addActionListener(controller);
-        decimal.addActionListener(controller);
-        multiply.addActionListener(controller);
-        divide.addActionListener(controller);
-        leftParen.addActionListener(controller);
-        rightParen.addActionListener(controller);
+        InputMap inputs = mainPanel.getInputMap(JPanel.WHEN_IN_FOCUSED_WINDOW);
+        ActionMap actions = mainPanel.getActionMap();
+
+
+        for(Component c : mainPanel.getComponents()) {
+
+            if(c instanceof  JButton) {
+                actionCommand = ((JButton) c).getActionCommand();
+
+                keystroke = getKeyStroke(actionCommand);
+                inputs.put(keystroke, actionCommand);
+                keystroke = getNumPadStroke(actionCommand);
+                inputs.put(keystroke, actionCommand);
+
+                actions.put(actionCommand, new KeyAction(actionCommand, controller));
+                ((JButton) c).addActionListener(controller);
+            }
+        }
     }
 
     /**
@@ -82,5 +86,59 @@ class CalcLayout {
      */
     public void updateHistory() {
         lastEquation.setText(equationField.getText());
+    }
+
+    public KeyStroke getNumPadStroke(String actionCommand) {
+        switch (actionCommand) {
+            case "0": return KeyStroke.getKeyStroke("NUMPAD0");
+            case "1": return KeyStroke.getKeyStroke("NUMPAD1");
+            case "2": return KeyStroke.getKeyStroke("NUMPAD2");
+            case "3": return KeyStroke.getKeyStroke("NUMPAD3");
+            case "4": return KeyStroke.getKeyStroke("NUMPAD4");
+            case "5": return KeyStroke.getKeyStroke("NUMPAD5");
+            case "6": return KeyStroke.getKeyStroke("NUMPAD6");
+            case "7": return KeyStroke.getKeyStroke("NUMPAD7");
+            case "8": return KeyStroke.getKeyStroke("NUMPAD8");
+            case "9": return KeyStroke.getKeyStroke("NUMPAD9");
+            case "+": return KeyStroke.getKeyStroke("ADD");
+            case "-": return KeyStroke.getKeyStroke("SUBTRACT");
+            case "/": return KeyStroke.getKeyStroke("DIVIDE");
+            case "*": return KeyStroke.getKeyStroke("MULTIPLY");
+            case "^": return KeyStroke.getKeyStroke("CIRCUMFLEX");
+            case "=": return KeyStroke.getKeyStroke("ENTER");
+            case "b": return KeyStroke.getKeyStroke("BACK_SPACE");
+            case ".": return KeyStroke.getKeyStroke("DECIMAL");
+            case ")": return KeyStroke.getKeyStroke("RIGHT_PARENTHESIS");
+            case "(": return KeyStroke.getKeyStroke("LEFT_PARENTHESIS");
+            case "C": return KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
+            default: return null;
+        }
+    }
+
+    public KeyStroke getKeyStroke(String actionCommand) {
+        switch (actionCommand) {
+            case "0": return KeyStroke.getKeyStroke("0");
+            case "1": return KeyStroke.getKeyStroke("1");
+            case "2": return KeyStroke.getKeyStroke("2");
+            case "3": return KeyStroke.getKeyStroke("3");
+            case "4": return KeyStroke.getKeyStroke("4");
+            case "5": return KeyStroke.getKeyStroke("5");
+            case "6": return KeyStroke.getKeyStroke("6");
+            case "7": return KeyStroke.getKeyStroke("7");
+            case "8": return KeyStroke.getKeyStroke("8");
+            case "9": return KeyStroke.getKeyStroke("9");
+            case "+": return KeyStroke.getKeyStroke('=', InputEvent.SHIFT_DOWN_MASK);
+            case "-": return KeyStroke.getKeyStroke("MINUS");
+            case "/": return KeyStroke.getKeyStroke(KeyEvent.VK_SLASH, 0);
+            case "*": return KeyStroke.getKeyStroke('8', InputEvent.SHIFT_DOWN_MASK);
+            case "^": return KeyStroke.getKeyStroke('^');
+            case "=": return KeyStroke.getKeyStroke("EQUALS");
+            case "b":  return KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE,0);
+            case ".": return KeyStroke.getKeyStroke("PERIOD");
+            case ")": return KeyStroke.getKeyStroke(')');
+            case "(": return KeyStroke.getKeyStroke('(');
+            case "C": return KeyStroke.getKeyStroke('c');
+            default: return null;
+        }
     }
 }

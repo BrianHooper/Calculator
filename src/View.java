@@ -1,5 +1,6 @@
 import javax.swing.*;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 
 class View {
     public static final int MAX_SIZE = 25;
@@ -11,16 +12,16 @@ class View {
      */
     public View(Equation equationModel) {
         // Initialize the model
-        ActionListener controller = new Controller(equationModel, this);
+        Controller controller = new Controller(equationModel, this);
         layout = new CalcLayout(controller);
 
         JFrame frame = new JFrame("Calculator");
         frame.setContentPane(layout.getPanel());
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
         frame.pack();
         frame.setResizable(false);
         frame.setVisible(true);
-
     }
 
     /**
