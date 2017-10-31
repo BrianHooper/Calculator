@@ -49,7 +49,7 @@ class Equation {
      * Sets the current error message
      * @param msg String value with the current error message
      */
-    public void setErrorMessage(String msg) {
+    private void setErrorMessage(String msg) {
         errorMsg = msg;
     }
 
@@ -61,7 +61,6 @@ class Equation {
      */
     public boolean addOperand(String operand) {
         if (expression.length() + operand.length() > View.MAX_SIZE) {
-            setErrorMessage("Maximum length reached");
             return false;
         } else {
             expression.append(operand);
@@ -92,6 +91,7 @@ class Equation {
      * @return true if the expression calculated successfully.
      */
     public boolean calculate() {
+        // Don't try to evaluate a blank expression
         if (expression.length() == 0) {
             return false;
         }
@@ -99,11 +99,11 @@ class Equation {
         LinkedList<String> exprList;
 
         try {
-            exprList = toLinkedList(expression.toString());
-            exprList = toPostFix(exprList);
+            exprList = ExpressionConverter.toLinkedList(expression.toString());
+            exprList = ExpressionConverter.toPostFix(exprList);
             return evaluate(exprList);
         } catch (NumberFormatException | InvalidExpressionException e) {
-            setErrorMessage("Invalid expression");
+            setErrorMessage("Improper expression error");
             return false;
         }
     }
@@ -133,196 +133,6 @@ class Equation {
     }
 
     /**
-     * Converts an expression in infix form to a LinkedList of Strings
-     * where each element is either a number or an operator
-     *
-     * @param infix String element representing an infix expression
-     * @return LinkedList of Strings
-     * @throws NumberFormatException throws exception if a number is invalid
-     */
-    private LinkedList<String> toLinkedList(String infix) throws
-            NumberFormatException {
-        StringBuilder numberBuilder = new StringBuilder();
-        LinkedList<String> ifList = new LinkedList<>();
-
-        // Iterate over each character in the infix string
-        for (int i = 0; i < infix.length(); i++) {
-            // Retrieve a character from the infix string
-            char curChar = infix.charAt(i);
-
-            // If the character is an operator, add it to the pfList
-            if (!isNumber(curChar)) {
-                if(curChar == '.') {
-                    numberBuilder.append(curChar);
-                } else {
-                    // If there is a number currently being built
-                    // Add it to the pfList and clear the builder
-                    if (numberBuilder.length() > 0) {
-                        // Check that the number in the builder is valid
-                        isNumber(numberBuilder.toString());
-                        ifList.add(numberBuilder.toString());
-                        numberBuilder = new StringBuilder();
-                    }
-
-                    // Automatically add implied multiplication operator
-                    // When parenthesis are used
-                    if (curChar == '(' && !ifList.isEmpty() && isNumber(ifList.getLast())) {
-                        ifList.add("*");
-                        ifList.add(String.valueOf(curChar));
-                    } else if (curChar == ')' && i < infix.length() - 1 && (isNumber(String.valueOf(infix.charAt(i + 1))) || infix.charAt(i + 1) == '(')) {
-                        ifList.add(String.valueOf(curChar));
-                        ifList.add("*");
-                    } else {
-                        ifList.add(String.valueOf(curChar));
-                    }
-                }
-
-            } else {
-                // Append the current character to the numberBuilder
-                numberBuilder.append(curChar);
-            }
-        }
-
-        // Make sure the numberBuilder is cleared
-        if (numberBuilder.length() > 0) {
-
-            // Check that the number in the builder is valid
-            isNumber(numberBuilder.toString());
-            ifList.add(numberBuilder.toString());
-        }
-
-        return ifList;
-    }
-
-    /**
-     * Converts an infix LinkedList expression to a
-     * postfix LinkedList expression
-     *
-     * @param infix LinkedList of Strings representing the infix expression
-     * @return LinkedList of Strings as a postfix expression
-     */
-    private LinkedList<String> toPostFix(LinkedList<String> infix) throws
-            InvalidExpressionException {
-        LinkedList<String> postfix = new LinkedList<>();
-        Stack<String> stack = new Stack<>();
-        String currentElement;
-        String lastElement = null;
-
-        // Iterate over each element in the infix list
-        while (infix.size() > 0) {
-            // Pop the first element from the infix list
-            currentElement = infix.removeFirst();
-
-            if (currentElement.equals("(")) {
-                // Push the ( to the stack
-                stack.push(currentElement);
-            } else if (currentElement.equals(")")) {
-                // Pop the operands off the stack until a ) is encountered
-                while (!stack.isEmpty() && !stack.peek().equals("(")) {
-                    postfix.add(stack.pop());
-                }
-                if (!stack.isEmpty() && stack.peek().equals("(")) stack.pop();
-            } else if (isNumber(currentElement)) {
-                // Append the number to the postfix list
-                postfix.add(currentElement);
-                if (!stack.isEmpty() && stack.peek().equals("_")) {
-                    postfix.add(stack.pop());
-                }
-            } else {
-                if (currentElement.equals("-")) {
-                    if (lastElement == null) {
-                        stack.push("_");
-                    } else if (!lastElement.equals(")") && !isNumber(lastElement)) {
-                        stack.push("_");
-                    } else if (stack.isEmpty()) {
-                        stack.push(currentElement);
-                    }
-                } else {
-                    // Append the operators on the stack to the postfix list
-                    // Until a lower precedence operator is encountered
-                    while (!stack.isEmpty() && precedence(currentElement,
-                            stack.peek())) {
-                        postfix.add(stack.pop());
-                    }
-                    stack.push(currentElement);
-                }
-            }
-            lastElement = currentElement;
-        }
-
-        // Add any remaining operators in the stack to the postfix list
-        while (!stack.isEmpty()) {
-            if (stack.peek().equals("(")) {
-                throw new InvalidExpressionException();
-            } else postfix.add(stack.pop());
-        }
-
-        return postfix;
-    }
-
-    /**
-     * Checks if one input has precedence over the other
-     * using ^ greater than * / greater than + -
-     *
-     * @param a String operator
-     * @param b String operator
-     * @return true if a > b
-     */
-    private boolean precedence(String b, String a) {
-        return value(a) >= value(b);
-    }
-
-    /**
-     * Applies a value to an operator
-     *
-     * @param s The operator as a String
-     * @return int value representing the operators precedence
-     */
-    private int value(String s) {
-        switch (s) {
-            case "^":
-                return 5;
-            case "*":
-                return 4;
-            case "/":
-                return 3;
-            case "+":
-                return 2;
-            case "-":
-                return 1;
-            default:
-                return 0;
-        }
-    }
-
-    /**
-     * Checks that the input can be expressed as a valid
-     * floating-point number
-     *
-     * @param s String input
-     * @return true if the input is a number
-     */
-    private boolean isNumber(String s) {
-        try {
-            Double.parseDouble(s);
-            return true;
-        } catch (NumberFormatException e) {
-            return false;
-        }
-    }
-
-    /**
-     * Checks that the input can be expressed as a valid
-     * floating-point number
-     *
-     * @param c Character input
-     * @return true if the input is a number
-     */
-    private boolean isNumber(char c) {
-        return isNumber(String.valueOf(c));
-    }
-
-    /**
      * Attempts to evaluate a postfix expression
      *
      * @param postfix LinkedList of Strings representing an expression in
@@ -330,13 +140,13 @@ class Equation {
      * @return true if the expression was successfully evaluated
      */
     private boolean evaluate(LinkedList<String> postfix) {
-        LinkedList<String> stack = new LinkedList<>();
+        Stack<String> stack = new Stack<>();
         String current, a, b;
 
         while (!postfix.isEmpty()) {
             current = postfix.removeFirst();
 
-            if (isNumber(current)) {
+            if (ExpressionConverter.isNumber(current)) {
                 stack.push(current);
             } else {
                 try {
@@ -350,7 +160,7 @@ class Equation {
                     }
                 } catch (NumberFormatException | EmptyStackException |
                         NoSuchElementException e) {
-                    setErrorMessage("Evaluation error");
+                    setErrorMessage("Improper expression error");
                     return false;
                 } catch (InvalidExpressionException e) {
                     setErrorMessage(e.getMessage());
@@ -366,7 +176,7 @@ class Equation {
             result = Double.parseDouble(stack.pop());
             return true;
         } catch (NumberFormatException | EmptyStackException e) {
-            setErrorMessage("Evaluation error.");
+            setErrorMessage("Improper expression error");
             return false;
         }
     }
@@ -394,7 +204,7 @@ class Equation {
                 operationResult = Math.pow(num1, num2);
                 if (Double.isInfinite(operationResult)) {
                     throw new InvalidExpressionException(
-                            "Arithmetic overflow error.");
+                            "Arithmetic overflow error");
                 }
                 break;
             case "*":
@@ -403,7 +213,7 @@ class Equation {
             case "/":
                 if (num2 == 0.0) {
                     throw new InvalidExpressionException(
-                            "Cannot divide by zero");
+                            "Division by zero error");
                 }
                 operationResult = num1 / num2;
                 break;
@@ -414,7 +224,7 @@ class Equation {
                 operationResult = num1 - num2;
                 break;
             default:
-                throw new InvalidExpressionException("Error: unknown operator");
+                throw new InvalidExpressionException("Unknown operator error");
         }
 
         return String.valueOf(operationResult);

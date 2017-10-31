@@ -1,10 +1,9 @@
 import javax.swing.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 class Controller extends AbstractAction {
-    private Equation equationModel;
-    private View view;
+    private final Equation equationModel;
+    private final View view;
 
     /**
      * Creates a new ActionListener object for

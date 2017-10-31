@@ -1,13 +1,11 @@
 import javax.swing.*;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
 
 class View {
 
     // Maximum number of characters in the equation field
     public static final int MAX_SIZE = 25;
 
-    private CalcLayout layout;
+    private final CalcLayout layout;
 
     /**
      * Instantiates the GUI

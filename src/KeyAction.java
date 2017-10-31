@@ -1,10 +1,10 @@
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 
-public class KeyAction extends AbstractAction {
+class KeyAction extends AbstractAction {
 
-    private Controller control;
-    private String event;
+    private final Controller control;
+    private final String event;
 
     public KeyAction(String e, Controller c) {
         this.control = c;
