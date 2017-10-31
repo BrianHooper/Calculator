@@ -11,6 +11,10 @@ public class KeyAction extends AbstractAction {
         this.event = e;
     }
 
+    /**
+     * Listener for keyboard events, routes input to the controller
+     * @param e ActionEvent corresponding to a key press
+     */
     @Override
     public void actionPerformed(ActionEvent e) {
         control.performAction(event);

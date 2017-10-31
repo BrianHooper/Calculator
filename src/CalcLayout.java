@@ -1,9 +1,8 @@
 import javax.swing.*;
+import javax.swing.border.Border;
 import java.awt.*;
-import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-import java.security.Key;
 
 class CalcLayout {
 
@@ -32,6 +31,7 @@ class CalcLayout {
     private JButton divide;
     private JButton leftParen;
     private JButton rightParen;
+    private JButton Prev;
 
 
     /**
@@ -50,17 +50,25 @@ class CalcLayout {
         for(Component c : mainPanel.getComponents()) {
 
             if(c instanceof  JButton) {
+
                 actionCommand = ((JButton) c).getActionCommand();
 
+                // Map keyboard bindings to specific button commands
                 keystroke = getKeyStroke(actionCommand);
                 inputs.put(keystroke, actionCommand);
                 keystroke = getNumPadStroke(actionCommand);
                 inputs.put(keystroke, actionCommand);
-
                 actions.put(actionCommand, new KeyAction(actionCommand, controller));
+
+                // Map the controller to the button
                 ((JButton) c).addActionListener(controller);
             }
         }
+
+        // 10px internal padding within the equation field
+        Border padding = BorderFactory.createEmptyBorder(0,10,0,10);
+        equationField.setBorder(padding);
+        lastEquation.setBorder(padding);
     }
 
     /**
@@ -77,7 +85,7 @@ class CalcLayout {
      */
     public void update(String message) {
 
-        equationField.setText("  " + message);
+        equationField.setText(message);
     }
 
     /**
@@ -88,7 +96,27 @@ class CalcLayout {
         lastEquation.setText(equationField.getText());
     }
 
-    public KeyStroke getNumPadStroke(String actionCommand) {
+    /**
+     * Getter method for last equation text field
+     * @return Current value of last equation text field
+     */
+    public String getHistory() {
+        return lastEquation.getText();
+    }
+
+    /**
+     * Clear the last equation text field
+     */
+    public void clearHistory() {
+        lastEquation.setText("");
+    }
+
+    /**
+     * Binds action commands to numberpad keyboard events
+     * @param actionCommand String action command corresponding to a button
+     * @return Keystroke object corresponding to a keyboard event
+     */
+    private KeyStroke getNumPadStroke(String actionCommand) {
         switch (actionCommand) {
             case "0": return KeyStroke.getKeyStroke("NUMPAD0");
             case "1": return KeyStroke.getKeyStroke("NUMPAD1");
@@ -115,7 +143,12 @@ class CalcLayout {
         }
     }
 
-    public KeyStroke getKeyStroke(String actionCommand) {
+    /**
+     * Binds action commands to standard keyboard events
+     * @param actionCommand String action command corresponding to a button
+     * @return Keystroke object corresponding to a keyboard event
+     */
+    private KeyStroke getKeyStroke(String actionCommand) {
         switch (actionCommand) {
             case "0": return KeyStroke.getKeyStroke("0");
             case "1": return KeyStroke.getKeyStroke("1");

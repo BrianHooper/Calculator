@@ -4,7 +4,7 @@ import java.util.NoSuchElementException;
 import java.util.Stack;
 
 class Equation {
-    private StringBuilder expression, modifiedExpression, postfixExpression, errorListing;
+    private StringBuilder expression;
     private String errorMsg;
     private double result;
     private int size;
@@ -22,16 +22,13 @@ class Equation {
      */
     public void clear() {
         expression = new StringBuilder();
-        modifiedExpression = new StringBuilder();
-        postfixExpression = new StringBuilder();
-        errorListing = new StringBuilder();
         result = 0.0;
         errorMsg = "";
         size = 0;
     }
 
     /**
-     * Returns the current expression, before it has been evaluated
+     * Getter method for the expression
      * @return String representing the current expression
      */
     public String getExpression() {
@@ -39,16 +36,13 @@ class Equation {
     }
 
     /**
-     * Returns a string containing the original expression, modified expression,
-     * postfix expression, calculation result, and error message.
-     * @return String representing the previous calculation
+     * Setter method for the expression
+     * @param expr String parameter for setting expression
      */
-    public String getErrorLog() {
-        return "Original Expression: " + expression.toString() +
-                "\nModified Expression: " + modifiedExpression.toString() +
-                "\nPostfix Expression: " + postfixExpression.toString() +
-                "\nResult: " + String.valueOf(result) +
-                "\nError Message: " +  errorListing.toString();
+    public void setExpression(String expr) {
+        clear();
+        expression.append(expr);
+        size = expr.length();
     }
 
     /**
@@ -57,7 +51,6 @@ class Equation {
      */
     public void setErrorMessage(String msg) {
         errorMsg = msg;
-        errorListing.append(msg);
     }
 
     /**
@@ -99,7 +92,6 @@ class Equation {
      * @return true if the expression calculated successfully.
      */
     public boolean calculate() {
-        System.out.println(expression.length());
         if (expression.length() == 0) {
             return false;
         }
@@ -199,9 +191,6 @@ class Equation {
             ifList.add(numberBuilder.toString());
         }
 
-        // Log the modified expression for error output
-        for (String s : ifList) modifiedExpression.append(s);
-
         return ifList;
     }
 
@@ -267,9 +256,6 @@ class Equation {
                 throw new InvalidExpressionException();
             } else postfix.add(stack.pop());
         }
-
-        // Log the postfix expression for error output
-        for (String s : postfix) postfixExpression.append(s);
 
         return postfix;
     }

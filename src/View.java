@@ -3,11 +3,14 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 
 class View {
+
+    // Maximum number of characters in the equation field
     public static final int MAX_SIZE = 25;
+
     private CalcLayout layout;
 
     /**
-     * Creates a GUI
+     * Instantiates the GUI
      * @param equationModel Model field for calculating expressions
      */
     public View(Equation equationModel) {
@@ -39,5 +42,20 @@ class View {
      */
     public void updateHistory() {
         layout.updateHistory();
+    }
+
+    /**
+     * Getter method for last equation text field
+     * @return Current value of last equation text field
+     */
+    public String getHistory() {
+        return layout.getHistory();
+    }
+
+    /**
+     * Clears the last equation text field
+     */
+    public void clearHistory() {
+        layout.clearHistory();
     }
 }

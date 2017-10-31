@@ -27,30 +27,17 @@ class Controller extends AbstractAction {
         performAction(action);
     }
 
+    /**
+     * ActionListener for button presses or keyboard events
+     * Routes input from the GUI to the equation model
+     * @param action Action command
+     */
     public void performAction(String action) {
         switch(action) {
-            case "=": {
-                view.updateHistory();
-                if(equationModel.calculate()) {
-                    view.update(equationModel.getResult());
-
-                } else {
-                    view.update(equationModel.getErrorMsg());
-                }
-                System.out.println(equationModel.getErrorLog());
-                equationModel.clear();
-                break;
-            }
-            case "C":
-                equationModel.clear();
-                view.update("");
-                view.updateHistory();
-                break;
-            case "b":
-                if(equationModel.backspace()) {
-                    view.update(equationModel.getExpression());
-                }
-                break;
+            case "=": compute(); break;
+            case "C": clear(); break;
+            case "b": backspace(); break;
+            case "H": history(); break;
             default:
                 if(equationModel.addOperand(action)) {
                     view.update(equationModel.getExpression());
@@ -58,4 +45,59 @@ class Controller extends AbstractAction {
                 break;
         }
     }
+
+    /**
+     * Attempt to perform the calculation
+     * currently in the equation field
+     */
+    private void compute() {
+
+        // Set the history field equal to the current equation field
+        view.updateHistory();
+
+        // Attempt to perform the calculation
+        // If valid, set the equation field to the result, otherwise
+        // set it to the error message
+        if(equationModel.calculate()) {
+            view.update(equationModel.getResult());
+
+        } else {
+            view.update(equationModel.getErrorMsg());
+        }
+
+        // Reset the equation for next input
+        equationModel.clear();
+    }
+
+    /**
+     * Clear both the equation and history fields
+     */
+    private void clear() {
+        equationModel.clear();
+        view.update("");
+        view.updateHistory();
+    }
+
+    /**
+     * Remove the last char from the equation field
+     */
+    private void backspace() {
+        if(equationModel.backspace()) {
+            view.update(equationModel.getExpression());
+        }
+    }
+
+    /**
+     * Place the last calculated equation back into the equation field
+     */
+    private void history() {
+        String history = view.getHistory();
+        if(history.length() > 0) {
+            view.update(history);
+            view.clearHistory();
+            equationModel.setExpression(history);
+        }
+
+    }
+
 }
