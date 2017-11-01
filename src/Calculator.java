@@ -7,6 +7,7 @@ class Calculator {
      */
     private void run() {
         new View(new Equation());
+
     }
 
     public static void main(String[] args) {
