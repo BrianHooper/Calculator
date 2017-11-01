@@ -25,7 +25,6 @@ class ExpressionConverter {
             if (!isNumber(curChar)) {
                 if(curChar == '.') {
                     numberBuilder.append(curChar);
-                    numberBuilder.insert(0, '-');
                 } else {
                     // If there is a number currently being built
                     // Add it to the pfList and clear the builder
@@ -60,8 +59,9 @@ class ExpressionConverter {
         if (numberBuilder.length() > 0) {
 
             // Check that the number in the builder is valid
-            isNumber(numberBuilder.toString());
-            ifList.add(numberBuilder.toString());
+            if(isNumber(numberBuilder.toString())) {
+                ifList.add(numberBuilder.toString());
+            }
         }
 
         return ifList;
@@ -167,7 +167,7 @@ class ExpressionConverter {
      * @return true if the input is a number
      */
     public static boolean isNumber(String s) {
-        return s.matches("-?\\d+(\\.\\d+)?");
+        return ("0" + s).matches("-?\\d+(\\.\\d+)?");
     }
 
     /**
