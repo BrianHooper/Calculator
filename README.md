@@ -1,6 +1,8 @@
 # Calculator
 Simple java-based calculator with GUI
 
+![calculator](calculator.png)
+
 ### Compiling
 
 Simply run
